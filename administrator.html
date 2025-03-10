@@ -6,111 +6,85 @@
     <title>Admin Panel</title>
     <style>
         body {
-            background-color: #1a1a1a;
+            background-color: #1e1e1e;
             color: white;
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
         }
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: red;
+        }
         button {
-            background-color: #007bff;
-            color: white;
             padding: 10px;
-            border: none;
+            margin: 10px;
+            font-size: 16px;
             cursor: pointer;
-            margin: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #adminBox {
-            border: 2px solid yellow;
-            padding: 20px;
         }
     </style>
 </head>
 <body>
-
-    <div id="adminBox">
-        <h2>Admin Panel</h2>
-        <p>Waktu tersisa: <span id="adminTimer">30:00</span></p>
-        <button onclick="resetTimer()">Reset Timer</button>
-        <button onclick="addTime(300)">Tambah 5 Menit</button>
-        <button onclick="subtractTime(300)">Kurangi 5 Menit</button>
-        <button onclick="stopTimer()">Hentikan Waktu</button>
-
-        <h3>Pesan dari Pengguna:</h3>
-        <p id="userMessage">Tidak ada pesan</p>
-        <button onclick="deleteMessage()">Hapus Pesan</button>
-
-        <h3>Konfirmasi Akun:</h3>
-        <button onclick="confirmAccount()">Konfirmasi Akun</button>
-        <button onclick="removeConfirmation()">Hapus Konfirmasi Akun</button>
-    </div>
+    <h1>Admin Panel</h1>
+    <p>Kontrol waktu hukuman peminjam akun.</p>
+    <div id="timer">30:00</div>
+    
+    <button onclick="addTime(5)">+5 Menit</button>
+    <button onclick="addTime(10)">+10 Menit</button>
+    <button onclick="reduceTime(5)">-5 Menit</button>
+    <button onclick="reduceTime(10)">-10 Menit</button>
+    <button onclick="stopTimer()">Hentikan</button>
+    <button onclick="resetTimer()">Reset</button>
 
     <script>
-        function updateAdminTimer() {
-            let time = localStorage.getItem("countdown") || 1800;
-            let minutes = Math.floor(time / 60);
-            let seconds = time % 60;
-            document.getElementById("adminTimer").textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        let countdown = 30 * 60;
+        let interval;
+
+        function updateTimer() {
+            let minutes = Math.floor(countdown / 60);
+            let seconds = countdown % 60;
+            document.getElementById("timer").innerText = 
+                (minutes < 10 ? "0" : "") + minutes + ":" + 
+                (seconds < 10 ? "0" : "") + seconds;
         }
 
-        function resetTimer() {
-            localStorage.setItem("countdown", 1800);
-            localStorage.setItem("countdownStopped", "false");
-            updateAdminTimer();
-            alert("Waktu telah di-reset ke 30 menit.");
+        function startTimer() {
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => {
+                if (countdown > 0) {
+                    countdown--;
+                    updateTimer();
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
         }
 
-        function addTime(seconds) {
-            let time = parseInt(localStorage.getItem("countdown") || 1800);
-            localStorage.setItem("countdown", time + seconds);
-            localStorage.setItem("countdownStopped", "false");
-            updateAdminTimer();
-            alert("Waktu ditambah.");
+        function addTime(minutes) {
+            countdown += minutes * 60;
+            updateTimer();
         }
 
-        function subtractTime(seconds) {
-            let time = parseInt(localStorage.getItem("countdown") || 1800);
-            time = Math.max(0, time - seconds);
-            localStorage.setItem("countdown", time);
-            localStorage.setItem("countdownStopped", "false");
-            updateAdminTimer();
-            alert("Waktu dikurangi.");
+        function reduceTime(minutes) {
+            countdown -= minutes * 60;
+            if (countdown < 0) countdown = 0;
+            updateTimer();
         }
 
         function stopTimer() {
-            localStorage.setItem("countdownStopped", "true");
-            alert("Waktu dihentikan.");
-            updateAdminTimer();
+            clearInterval(interval);
         }
 
-        function loadUserMessage() {
-            let message = localStorage.getItem("adminMessage") || "Tidak ada pesan";
-            document.getElementById("userMessage").textContent = message;
+        function resetTimer() {
+            countdown = 30 * 60;
+            updateTimer();
+            startTimer();
         }
 
-        function deleteMessage() {
-            localStorage.removeItem("adminMessage");
-            document.getElementById("userMessage").textContent = "Tidak ada pesan";
-            alert("Pesan telah dihapus.");
-        }
-
-        function confirmAccount() {
-            localStorage.setItem("accountConfirmed", "true");
-            alert("Akun telah dikonfirmasi!");
-        }
-
-        function removeConfirmation() {
-            localStorage.removeItem("accountConfirmed");
-            alert("Konfirmasi akun telah dihapus! Peringatan akan muncul kembali.");
-        }
-
-        updateAdminTimer();
-        loadUserMessage();
-        setInterval(updateAdminTimer, 1000);
+        updateTimer();
+        startTimer();
     </script>
-
 </body>
 </html>
