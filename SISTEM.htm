@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peringatan Ancaman</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #warningBox, #confirmedBox {
+            border: 2px solid red;
+            padding: 20px;
+            display: none;
+        }
+        #confirmedBox {
+            border-color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="warningBox">
+        <h2>⚠ PERINGATAN ANCAMAN ⚠</h2>
+        <p>Kamu telah mengambil alih akun Google Code: <strong>222</strong></p>
+        <p>Hukuman akan diberikan dalam: <span id="timer">30:00</span></p>
+        <p>Kembalikan akun kepada pemiliknya dengan mengirim pesan ke admin.<p>Informasi Account: No Write albi*******@gmail.com</p><p>Kirim Informasi email dan sandi</p></p>
+        <textarea id="userMessage" placeholder="Ketik pesan di sini..." style="width: 300px; height: 130px">email: contoh@gmail.com sandi/password: contoh222</textarea><br>
+        <button onclick="sendMessage()">Kirim Pesan</button>
+    </div>
+
+    <div id="confirmedBox">
+        <h2>✅ Akun Telah Dikonfirmasi</h2>
+        <p>Terima kasih telah mengonfirmasi akun ini. Semua peringatan telah dihapus.</br>Tapi anda masih kami awasi.</br><p style="color: lightblue">@Rully al varel</p></p>
+    </div>
+
+    <script>
+        function startCountdown() {
+            let time = parseInt(localStorage.getItem("countdown")) || 1800;
+            let isStopped = localStorage.getItem("countdownStopped") === "true";
+            const timerElement = document.getElementById("timer");
+
+            function updateTimer() {
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (time <= 0) {
+                    clearInterval(interval);
+                    alert("Hukuman telah diberikan ke email Anda!");
+                } else if (!isStopped) {
+                    time--;
+                    localStorage.setItem("countdown", time);
+                }
+            }
+
+            updateTimer();
+            if (!isStopped) {
+                var interval = setInterval(updateTimer, 1000);
+            }
+        }
+
+        function sendMessage() {
+            let message = document.getElementById("userMessage").value;
+            if (message.trim() === "") {
+                alert("Pesan tidak boleh kosong!");
+                return;
+            }
+            localStorage.setItem("adminMessage", message);
+            alert("Pesan telah dikirim ke admin.");
+            document.getElementById("userMessage").value = "";
+        }
+
+        function checkConfirmation() {
+            if (localStorage.getItem("accountConfirmed") === "true") {
+                document.getElementById("warningBox").style.display = "none";
+                document.getElementById("confirmedBox").style.display = "block";
+            } else {
+                document.getElementById("warningBox").style.display = "block";
+                document.getElementById("confirmedBox").style.display = "none";
+                startCountdown();
+            }
+        }
+
+        checkConfirmation();
+    </script>
+
+</body>
+</html>
