@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Captive Portal — Web Tongkrongan</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;padding:0;display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0f172a,#0ea5a4);color:#fff}
+  .card{background:rgba(255,255,255,0.06);padding:28px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.4);width:360px}
+  h1{font-size:20px;margin:0 0 10px}
+  label{font-size:13px;display:block;margin-top:10px}
+  input,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#fff;outline:none}
+  button{margin-top:14px;background:#06b6d4;border:none;cursor:pointer;font-weight:600}
+  small{opacity:0.8}
+  .status{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.04);font-size:14px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="card" role="main">
+    <h1>Selamat datang di Web Tongkrongan</h1>
+    <p><small>Sebelum masuk, isi nama dan kata-kata keren dulu ya.</small></p>
+
+    <label for="name">Nama</label>
+    <input id="name" autocomplete="off" placeholder="Nama kamu..." />
+
+    <label for="phrase">Kata-kata keren</label>
+    <textarea id="phrase" rows="3" placeholder="Tulis kata-kata yang keren..."></textarea>
+
+    <button id="submitBtn">Submit & Minta Izin</button>
+
+    <div id="status" class="status hidden"></div>
+  </div>
+
+<script>
+/*
+Simple captive flow:
+- Each client gets a token stored in localStorage "cp_token"
+- User entries stored in localStorage "cp_users" (array)
+- Admin must set allowed=true for the token to be allowed
+- Export/Import available in admin page
+*/
+
+function uid(len=16){
+  const r = ()=> Math.floor(Math.random()*36).toString(36);
+  let s='';
+  while(s.length < len) s += r();
+  return s.slice(0,len);
+}
+
+const submitBtn = document.getElementById('submitBtn');
+const nameInput = document.getElementById('name');
+const phraseInput = document.getElementById('phrase');
+const statusEl = document.getElementById('status');
+
+function loadUsers(){
+  try{
+    return JSON.parse(localStorage.getItem('cp_users')||'[]');
+  }catch(e){ return []; }
+}
+function saveUsers(arr){
+  localStorage.setItem('cp_users', JSON.stringify(arr));
+}
+function getToken(){
+  let t = localStorage.getItem('cp_token');
+  if(!t){
+    t = uid(24);
+    localStorage.setItem('cp_token', t);
+  }
+  return t;
+}
+
+function checkAccess(){
+  const token = getToken();
+  const users = loadUsers();
+  const me = users.find(u => u.token === token);
+  if(me && me.allowed){
+    // akses dibuka — redirect ke web tongkrongan (atau tampil halaman)
+    statusEl.classList.remove('hidden');
+    statusEl.textContent = 'Akses diterima! Mengarahkan ke Web Tongkrongan...';
+    // ganti URL di bawah sesuai alamat web tongkronganmu
+    setTimeout(()=> {
+      window.location.href = '/tongkrongan.html'; // ganti kalau perlu
+    }, 1000);
+    return true;
+  }
+  return false;
+}
+
+function showPopup(text){
+  alert(text); // sederhana — pakai alert untuk popup kata-kata
+}
+
+submitBtn.addEventListener('click', ()=>{
+  const name = nameInput.value.trim();
+  const phrase = phraseInput.value.trim();
+  if(!name || !phrase){
+    statusEl.classList.remove('hidden'); statusEl.textContent = 'Nama dan kata-kata harus diisi.';
+    return;
+  }
+
+  const token = getToken();
+  const users = loadUsers();
+  // kalau sudah ada entri untuk token, update
+  let entry = users.find(u => u.token === token);
+  if(entry){
+    entry.name = name;
+    entry.phrase = phrase;
+    entry.status = 'pending';
+    entry.allowed = false;
+    entry.updatedAt = new Date().toISOString();
+  } else {
+    entry = {
+      token, name, phrase,
+      status: 'pending',
+      allowed: false,
+      createdAt: new Date().toISOString()
+    };
+    users.push(entry);
+  }
+  saveUsers(users);
+
+  // Popup: kata-kata lagi di cek sama admin tunggu ya!!
+  showPopup('Kata-kata kamu sudah terkirim.\nCek sama admin — tunggu ya!!');
+  statusEl.classList.remove('hidden');
+  statusEl.textContent = 'Terkirim. Tunggu konfirmasi admin.';
+  // setelah submit, secara periodik cek apakah sudah di-allow
+  // kita cek setiap 5 detik sampai 60 detik (sederhana)
+  let tries = 0;
+  const interval = setInterval(()=>{
+    tries++;
+    const users2 = loadUsers();
+    const me2 = users2.find(u=>u.token===token);
+    if(me2 && me2.allowed){
+      clearInterval(interval);
+      statusEl.textContent = 'Akses diterima! Mengarahkan...';
+      setTimeout(()=> window.location.href = '/tongkrongan.html', 900);
+    } else if(tries > 12){
+      clearInterval(interval);
+      // biarkan user menunggu dan admin cek manual
+    }
+  }, 5000);
+});
+
+// On load: kalau sudah di-allow => langsung redirect
+document.addEventListener('DOMContentLoaded', ()=> {
+  checkAccess();
+});
+</script>
+</body>
+</html>
