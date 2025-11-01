@@ -3,177 +3,57 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Admin — Captive Portal</title>
+<title>Admin Portal</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;padding:20px;background:#0f172a;color:#fff}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-  .card{background:rgba(255,255,255,0.03);padding:16px;border-radius:10px}
-  input,button,select,textarea{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#fff;outline:none}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
-  button.primary{background:#06b6d4;border:none;color:#062024;padding:8px 12px;border-radius:8px;cursor:pointer}
-  button.danger{background:#ef4444;border:none;color:#fff;padding:6px 8px;border-radius:6px;cursor:pointer}
-  .small{font-size:12px;opacity:0.85}
-  .controls{display:flex;gap:8px}
-  .right{display:flex;gap:8px;align-items:center}
-  .search{width:220px}
-  .badge{padding:4px 8px;border-radius:999px;font-size:12px}
+body{font-family:sans-serif;background:#0f172a;color:#fff;padding:20px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border-bottom:1px solid rgba(255,255,255,0.2);padding:8px;text-align:left}
+button{padding:6px 10px;border:none;border-radius:6px;margin-right:5px;cursor:pointer}
+.allow{background:#06b6d4;color:#062024}
+.deny{background:#ef4444}
+.refresh{background:#22c55e;color:#fff;margin-bottom:10px}
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <h2 style="margin:0">Admin Panel — Captive Portal</h2>
-    <div class="small">Kelola akses pengunjung — Izinkan / Tolak / Kill</div>
-  </div>
-  <div class="right">
-    <input id="pw" type="password" placeholder="Password admin" />
-    <button id="loginBtn" class="primary">Login</button>
-  </div>
-</header>
-
-<div id="main" class="card" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <div class="controls">
-      <input id="search" class="search" placeholder="Cari nama atau phrase..." />
-      <button id="refresh">Refresh</button>
-      <button id="exportBtn">Export DB</button>
-      <input id="importFile" type="file" accept="application/json" />
-    </div>
-    <div>
-      <span class="badge" id="stats">Users: 0</span>
-    </div>
-  </div>
-
-  <table id="usersTable">
-    <thead><tr><th>Nama</th><th>Kata-kata</th><th>Status</th><th>Dibuat</th><th>Aksi</th></tr></thead>
-    <tbody></tbody>
-  </table>
-</div>
+<h2>Admin Panel — Portal Tongkrongan</h2>
+<button class="refresh" id="refresh">Refresh</button>
+<table>
+  <thead><tr><th>Nama</th><th>Kata-kata</th><th>Status</th><th>Aksi</th></tr></thead>
+  <tbody id="userlist"></tbody>
+</table>
 
 <script>
-/* Admin simple client-side DB */
-const ADMIN_PASSWORD = 'admin123'; // ganti sebelum deploy ke password aman
-let loggedIn = false;
-
-function loadUsers(){
-  try{ return JSON.parse(localStorage.getItem('cp_users')||'[]'); }catch(e){ return []; }
-}
-function saveUsers(arr){ localStorage.setItem('cp_users', JSON.stringify(arr)); }
-
-function renderTable(filter=''){
-  const tbody = document.querySelector('#usersTable tbody');
-  const users = loadUsers();
-  const f = filter.trim().toLowerCase();
+async function loadUsers(){
+  const res = await fetch('api/get_users.php');
+  const data = await res.json();
+  const tbody = document.getElementById('userlist');
   tbody.innerHTML = '';
-  const sorted = users.slice().sort((a,b)=> new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-  sorted.forEach(u=>{
-    if(f){
-      if(!( (u.name||'').toLowerCase().includes(f) || (u.phrase||'').toLowerCase().includes(f) || (u.status||'').toLowerCase().includes(f) )) return;
-    }
+  data.forEach(u=>{
     const tr = document.createElement('tr');
-    const statusText = u.allowed ? 'ALLOWED' : (u.status || 'pending').toUpperCase();
     tr.innerHTML = `
-      <td>${escapeHtml(u.name||'')}</td>
-      <td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(u.phrase||'')}</td>
-      <td>${statusText}</td>
-      <td>${new Date(u.createdAt||'').toLocaleString()||'-'}</td>
+      <td>${u.nama}</td>
+      <td>${u.kata}</td>
+      <td>${u.status}</td>
       <td>
-        <button class="primary" data-token="${u.token}" data-act="allow">${u.allowed ? 'Allowed' : 'Izinkan'}</button>
-        <button data-token="${u.token}" data-act="deny">Tolak</button>
-        <button class="danger" data-token="${u.token}" data-act="kill">Kill</button>
-      </td>
-    `;
+        <button class="allow" onclick="updateUser('${u.id}','allow')">Izinkan</button>
+        <button class="deny" onclick="updateUser('${u.id}','deny')">Tolak</button>
+        <button onclick="updateUser('${u.id}','kill')">Kill</button>
+      </td>`;
     tbody.appendChild(tr);
   });
-  document.getElementById('stats').textContent = 'Users: ' + users.length;
 }
 
-function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
-
-document.getElementById('loginBtn').addEventListener('click', ()=>{
-  const pw = document.getElementById('pw').value;
-  if(pw === ADMIN_PASSWORD){
-    loggedIn = true;
-    document.getElementById('main').style.display = 'block';
-    document.getElementById('pw').value = '';
-    renderTable();
-  } else {
-    alert('Password salah!');
-  }
-});
-
-document.getElementById('refresh').addEventListener('click', ()=> renderTable(document.getElementById('search').value));
-
-document.getElementById('search').addEventListener('input', (e)=> renderTable(e.target.value));
-
-document.querySelector('#usersTable tbody').addEventListener('click', (ev)=>{
-  const btn = ev.target.closest('button');
-  if(!btn) return;
-  const token = btn.dataset.token;
-  const act = btn.dataset.act;
-  let users = loadUsers();
-  const idx = users.findIndex(u=>u.token===token);
-  if(idx === -1) { alert('User tidak ditemukan'); return; }
-
-  if(act === 'allow'){
-    users[idx].allowed = true;
-    users[idx].status = 'allowed';
-    users[idx].allowedAt = new Date().toISOString();
-    saveUsers(users);
-    renderTable(document.getElementById('search').value);
-  } else if(act === 'deny'){
-    users[idx].allowed = false;
-    users[idx].status = 'denied';
-    saveUsers(users);
-    renderTable(document.getElementById('search').value);
-  } else if(act === 'kill'){
-    // kill => hapus token / atau set allowed=false sehingga user harus submit lagi
-    // kita set status jadi 'killed' dan hapus token agar client tidak otomatis diterima
-    users[idx].allowed = false;
-    users[idx].status = 'killed';
-    // option: remove token so client get new token on next visit
-    // users[idx].token = 'killed_'+Date.now();
-    saveUsers(users);
-    renderTable(document.getElementById('search').value);
-    alert('User telah dikill — mereka harus submit lagi.');
-  }
-});
-
-// Export DB
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const users = loadUsers();
-  const blob = new Blob([JSON.stringify(users, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'users.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-});
-
-// Import DB
-document.getElementById('importFile').addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = function(){
-    try{
-      const data = JSON.parse(r.result);
-      if(!Array.isArray(data)) throw new Error('Format salah');
-      saveUsers(data);
-      renderTable();
-      alert('DB berhasil di-import.');
-    }catch(err){
-      alert('Gagal import: ' + err.message);
-    }
-  };
-  r.readAsText(f);
-});
-
-// init: render empty if already logged in (e.g. page reload)
-if(localStorage.getItem('cp_users')){
-  // nothing - wait login
+async function updateUser(id, action){
+  await fetch('api/update_user.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: `id=${encodeURIComponent(id)}&action=${encodeURIComponent(action)}`
+  });
+  loadUsers();
 }
+
+document.getElementById('refresh').onclick = loadUsers;
+loadUsers();
 </script>
 </body>
 </html>
