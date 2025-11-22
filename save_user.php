@@ -3,18 +3,25 @@ function checkAnswer() {
     const puzzle = levelPuzzles[currentQuestion];
     const userAnswer = answerInput.value.trim().toLowerCase();
     
-    // ✅ FIX: Support kedua format dengan pengecekan yang benar
+    console.log("User answer:", userAnswer); // Debug
+    console.log("Puzzle data:", puzzle); // Debug
+    
+    // ✅ FIX: Cek dulu apakah ada property answers atau answer
     let isCorrect = false;
     
-    if (puzzle.answers && Array.isArray(puzzle.answers)) {
-        // Format array: ["jawaban1", "jawaban2", ...]
+    if (puzzle.answers) {
+        // Jika pakai array answers
+        console.log("Using answers array:", puzzle.answers); // Debug
         isCorrect = puzzle.answers.some(correctAnswer => 
             userAnswer === correctAnswer.toLowerCase()
         );
-    } else if (puzzle.answer && typeof puzzle.answer === 'string') {
-        // Format string: "jawaban"
+    } else if (puzzle.answer) {
+        // Jika pakai string answer  
+        console.log("Using answer string:", puzzle.answer); // Debug
         isCorrect = userAnswer === puzzle.answer.toLowerCase();
     }
+    
+    console.log("Is correct?", isCorrect); // Debug
     
     if (isCorrect) {
         // Correct answer
