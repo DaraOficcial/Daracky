@@ -3,23 +3,30 @@ function checkAnswer() {
     const puzzle = levelPuzzles[currentQuestion];
     const userAnswer = answerInput.value.trim().toLowerCase();
     
-    // Cek apakah jawaban user ada dalam array answers
-    const isCorrect = puzzle.answers.some(correctAnswer => 
-        userAnswer === correctAnswer.toLowerCase()
-    );
+    // ✅ Support kedua format: array [] dan string ""
+    let isCorrect = false;
+    
+    if (Array.isArray(puzzle.answers)) {
+        // Format array: ["jawaban1", "jawaban2", ...]
+        isCorrect = puzzle.answers.some(correctAnswer => 
+            userAnswer === correctAnswer.toLowerCase()
+        );
+    } else if (typeof puzzle.answer === 'string') {
+        // Format string: "jawaban"
+        isCorrect = userAnswer === puzzle.answer.toLowerCase();
+    }
     
     if (isCorrect) {
         // Correct answer
         score += 10;
         if (usedHints === 0) {
-            score += 5; // Bonus for no hints
+            score += 5;
         }
         
         showFeedback("✅ Benar! +" + (usedHints === 0 ? "15" : "10") + " points", "correct");
         currentQuestion++;
         
         if (currentQuestion >= levelPuzzles.length) {
-            // Level completed
             setTimeout(completeLevel, 1500);
         } else {
             setTimeout(nextQuestion, 1500);
@@ -36,4 +43,4 @@ function checkAnswer() {
     
     usedHints = 0;
     updateDisplay();
-          }
+            }
