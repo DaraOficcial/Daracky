@@ -3,15 +3,15 @@ function checkAnswer() {
     const puzzle = levelPuzzles[currentQuestion];
     const userAnswer = answerInput.value.trim().toLowerCase();
     
-    // ✅ Support kedua format: array [] dan string ""
+    // ✅ FIX: Support kedua format dengan pengecekan yang benar
     let isCorrect = false;
     
-    if (Array.isArray(puzzle.answers)) {
+    if (puzzle.answers && Array.isArray(puzzle.answers)) {
         // Format array: ["jawaban1", "jawaban2", ...]
         isCorrect = puzzle.answers.some(correctAnswer => 
             userAnswer === correctAnswer.toLowerCase()
         );
-    } else if (typeof puzzle.answer === 'string') {
+    } else if (puzzle.answer && typeof puzzle.answer === 'string') {
         // Format string: "jawaban"
         isCorrect = userAnswer === puzzle.answer.toLowerCase();
     }
