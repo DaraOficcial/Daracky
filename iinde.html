@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="Images/Icon/remove.png" />
+    <style>
+      * {
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    height: 100vh;
+    font-size: 62.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    background: #f8edfa;
+  }
+  
+  h1 {
+    font: 2rem "Cambria", "Cochin", Georgia, Times, "Times New Roman", serif;
+    color: #52b2db;
+    letter-spacing: 0.2rem;
+    padding: 0.3rem;* {
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        height: 100vh;
+        font-size: 62.5%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        background: #f8edfa;
+      }
+      
+      h1 {
+        font: 2rem "Cambria", "Cochin", Georgia, Times, "Times New Roman", serif;
+        color: #38464c;
+        letter-spacing: 0.2rem;
+        padding: 0.3rem;
+      }
+      
+      h4 {
+        font: 1rem "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+        color: #455a64;
+        text-align: center;
+        padding: 0.5rem;
+        margin: 1rem;
+      }
+      
+      .img {
+        height: 300px;
+        /* width: auto; */
+        padding: 0.8rem 1.6rem;
+        border-radius: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+      }
+      
+      img {
+        object-fit: contain;
+        width: 90%;
+        height: 90%;
+      }
+      
+      .custom-file-input {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        color: #ffffff;
+        background-color: #f5af09;
+        cursor: pointer;
+        border-radius: 0.4rem;
+        font: bold 15px "Quicksand", sans-serif;
+        transition: all 0.3s ease;
+      }
+      
+      .custom-file-input:hover {
+        background-color: #e09707;
+      }
+      
+      .btn {
+        padding: 1rem;
+        text-align: center;
+      }
+      
+      .btn-container {
+        display: flex;
+        justify-content: center;
+      }
+      
+      button {
+        position: relative;
+        padding: 0.8rem 1.6rem;
+        margin: 1rem;
+        border: none;
+        outline: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font: bold 1.2rem "Quicksand", sans-serif;
+        color: #ffffff;
+        transition: all 0.2s;
+      }
+      
+      .btn_loading .btn__text {
+        visibility: hidden;
+        opacity: 0;
+      }
+      
+      .btn_loading::after {
+        content: " ";
+        position: absolute;
+        width: 1.5rem;
+        height: 1.5rem;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        border: 0.4rem solid transparent;
+        border-radius: 50%;
+        border-top-color: #ffffff;
+        animation: loader 1s ease infinite;
+      }
+      
+      #removeBgButton:active {
+        background: #007a63;
+      }
+      
+      @keyframes loader {
+        from {
+          transform: rotate(0turn);
+        }
+        to {
+          transform: rotate(1turn);
+        }
+      }
+      
+      @media screen and (max-width: 760px) {
+        body {
+          font-size: 45%;
+        }
+        h1 {
+          font-size: 1.8rem;
+        }
+        button {
+          font-size: 1rem;
+        }
+        .img {
+          margin: 16px;
+          padding: 0;
+        }
+      }
+      
+  }
+  
+  h4 {
+    font: 1rem "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+      "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    color: #455a64;
+    text-align: center;
+    padding: 0.5rem;
+    margin: 1rem;
+  }
+  
+  .img {
+    height: 300px;
+    /* width: auto; */
+    padding: 0.8rem 1.6rem;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  }
+  
+  img {
+    object-fit: contain;
+    width: 90%;
+    height: 90%;
+  }
+  
+  .custom-file-input {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    color: #ffffff;
+    background-color: #140e00;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    font: bold 15px "Quicksand", sans-serif;
+    transition: all 0.3s ease;
+  }
+  
+  .custom-file-input:hover {
+    background-color: #e09707;
+  }
+  
+  .btn {
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .btn-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  button {
+    position: relative;
+    padding: 0.8rem 1.6rem;
+    margin: 1rem;
+    border: none;
+    outline: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font: bold 1.2rem "Quicksand", sans-serif;
+    color: #ffffff;
+    transition: all 0.2s;
+  }
+  
+  .btn_loading .btn__text {
+    visibility: hidden;
+    opacity: 0;
+  }
+  
+  .btn_loading::after {
+    content: " ";
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border: 0.4rem solid transparent;
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: loader 1s ease infinite;
+  }
+  
+  #removeBgButton:active {
+    background: #007a63;
+  }
+  
+  @keyframes loader {
+    from {
+      transform: rotate(0turn);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  
+  @media screen and (max-width: 760px) {
+    body {
+      font-size: 45%;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    button {
+      font-size: 1rem;
+    }
+    .img {
+      margin: 16px;
+      padding: 0;
+    }
+  }
+  
+    </style>
+    <title>Simple Background Remover</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Graphium 1.0 By DaraXy</h1>
+      <h2>Hapus Latar Belakang dari Gambar Anda</h2>
+
+      <form>
+        <div class="img">
+          <img id="uploadedImage" src="Images/removebg.jpg" alt="image" />
+        </div>
+        <div class="btn">
+          <input
+            type="file"
+            id="fileInput"
+            accept=".jpg, .jpeg, .png"
+            style="display: none"
+          />
+          <label id="file" for="fileInput" class="custom-file-input"
+            >Choose File</label
+          >
+
+          <button
+            type="button"
+            id="removeBgButton"
+            onclick="submitHandler()"
+            style="background-color: #5c196e"
+          >
+            <span class="btn__text">Upload</span>
+          </button>
+
+          <div class="btn-container">
+            <button
+              onclick="reset()"
+              id="reloadBtn"
+              style="background-color: #ff5252"
+            >
+              Reset
+            </button>
+            <button
+              style="background-color: #009579"
+              onclick="downloadFile()"
+              id="downloadBtn"
+            >
+              Download
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+  <script>
+    let imageURL;
+
+const fileInput = document.getElementById("fileInput");
+const file = document.getElementById("file");
+const uploadedImage = document.getElementById("uploadedImage");
+const removeBgButton = document.getElementById("removeBgButton");
+const downloadButton = document.getElementById("downloadBtn");
+const reloadButton = document.getElementById("reloadBtn");
+
+// Hide the download button initially
+reloadButton.style.display = "none";
+downloadButton.style.display = "none";
+
+fileInput.addEventListener("change", function (event) {
+  if (event.target.files && event.target.files[0]) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      uploadedImage.src = e.target.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+});
+
+function submitHandler() {
+  removeBgButton.classList.toggle("btn_loading");
+  const fileInput = document.getElementById("fileInput");
+  console.log(fileInput.files);
+  const image = fileInput.files[0];
+
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert("Please select an image before submitting.");
+    return;
+  }
+
+  // Multipart file
+  const formData = new FormData();
+  formData.append("image_file", image);
+  formData.append("size", "auto");
+
+  const apiKey = "cy1Ptt4EPQ8vis9prcKwSfHH";
+
+  fetch("https://api.remove.bg/v1.0/removebg", {
+    method: "POST",
+    headers: {
+      "X-Api-Key": apiKey,
+    },
+    body: formData,
+  })
+    .then(function (response) {
+      return response.blob();
+    })
+    .then(function (blob) {
+      console.log(blob);
+      const url = URL.createObjectURL(blob);
+      imageURL = url;
+      uploadedImage.src = url;
+      reloadButton.style.display = "block";
+      file.style.display = "none";
+
+      downloadButton.style.display = "block";
+      removeBgButton.style.display = "none";
+    })
+    .catch();
+}
+
+function downloadFile() {
+  var anchorElement = document.createElement("a");
+  anchorElement.href = imageURL;
+  anchorElement.download = "removebg.jpg";
+  document.body.appendChild(anchorElement);
+
+  anchorElement.click();
+
+  document.body.removeChild(anchorElement);
+}
+
+function reset() {
+  window.location.reload();
+}
+
+  </script>
+</html>
