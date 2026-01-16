@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Sensitivity Wizard – Real Aim Setup</title>
+    <style>
+        /* CSS Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a12;
+            --secondary-bg: #161620;
+            --card-bg: #1e1e2e;
+            --accent: #ff4757;
+            --accent-secondary: #ff9f43;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c0;
+            --border: #2a2a3a;
+            --premium: #00b894;
+            --free: #ff4757;
+        }
+
+        /* PERBAIKAN: Mengganti overflow hidden menjadi auto agar bisa scroll */
+        body {
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            
+            /* Background utama kita tetapkan ke warna solid */
+            background-color: var(--primary-bg); 
+            
+            /* Pastikan body adalah container untuk lapisan background */
+            position: relative; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+        
+        /* Gaya untuk lapisan background (div.bg-layer) */
+        .bg-layer {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; /* Pastikan di bawah konten */
+            background-size: cover; 
+            background-position: center center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out; /* Transisi hanya pada opacity */
+        }
+
+        .bg-layer.active {
+            opacity: 1;
+        }
+
+        /* 1. CONTAINER UTAMA (Tempat Konten) - SEMI TRANSPARAN */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            
+            /* Dibuat semi-transparan (Opacity 0.7) */
+            background: rgba(10, 10, 18, 0.7); 
+            min-height: 100vh;
+            position: relative; 
+            z-index: 1; /* Pastikan konten di atas background */
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-free {
+            background: var(--free);
+        }
+
+        .status-premium {
+            background: var(--premium);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 2. FORM GROUP / CARD - SEMI TRANSPARAN */
+        .form-group {
+            /* Warna latar belakang form group dibuat lebih transparan (Opacity 0.5) */
+            background: rgba(30, 30, 46, 0.5); 
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(42, 42, 58, 0.8); 
+        }
+
+        .form-group h2 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group h2 i {
+            color: var(--accent-secondary);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Slider */
+        .slider-container {
+            position: relative;
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -5px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        /* 4. BUTTON OPSI - SEMI TRANSPARAN */
+        .option-btn {
+            /* Warna latar belakang dibuat lebih transparan (Opacity 0.4) */
+            background: rgba(22, 22, 32, 0.4);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .option-btn.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .generate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 3. RESULTS - SEMI TRANSPARAN */
+        .results {
+            background: rgba(30, 30, 46, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(42, 42, 58, 0.8);
+        }
+
+        .results h2 {
+            color: var(--accent-secondary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .sensitivity-table {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .sensitivity-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sensitivity-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scope-name {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .sensitivity-range {
+            color: var(--accent-secondary);
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .tips {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tips h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            background: rgba(255, 159, 67, 0.1);
+            border: 1px solid var(--accent-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* 5. INPUT TEXT (Kode Redeem) - SEMI TRANSPARAN */
+        input[type="text"] {
+            width: 100%;
+            background: rgba(22, 22, 32, 0.5); 
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* Limit Message & Contact Info */
+        .limit-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .limit-message h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .limit-message p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .contact-info {
+            background: rgba(30, 30, 46, 0.5); /* Semi Transparan */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--accent-secondary);
+        }
+        
+        .contact-info strong {
+            color: var(--accent-secondary);
+        }
+
+        .reset-time {
+            background: rgba(22, 22, 32, 0.5); /* Semi Transparan */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-accent { color: var(--accent); }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-20 { margin-bottom: 20px; }
+        .mt-20 { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FF Sensitivity Wizard</h1>
+            <p>Real Aim Setup – No Fake Claims, No Cheats</p>
+            <div id="statusBadge" class="status-badge status-free">FREE</div>
+        </div>
+
+        <div id="mainContent" class="main-content">
+            <div class="form-group">
+                <h2>📱 Device Settings</h2>
+                
+                <div class="input-group">
+                    <label>Screen Size: <span id="screenValue">6.0</span> inches</label>
+                    <div class="slider-container">
+                        <span class="slider-value" id="screenDisplay">6.0"</span>
+                        <input type="range" id="screenSize" min="5.0" max="7.0" step="0.1" value="6.0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Refresh Rate</label>
+                    <div class="options-grid" id="refreshRate">
+                        <div class="option-btn selected" data-value="60">60Hz</div>
+                        <div class="option-btn" data-value="90">90Hz</div>
+                        <div class="option-btn" data-value="120">120Hz</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <h2>🎯 Playstyle</h2>
+                
+                <div class="input-group">
+                    <label>Combat Range</label>
+                    <div class="options-grid" id="combatRange">
+                        <div class="option-btn selected" data-value="close">Close</div>
+                        <div class="option-btn" data-value="medium">Medium</div>
+                        <div class="option-btn" data-value="far">Far</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Aim Style</label>
+                    <div class="options-grid" id="aimStyle">
+                        <div class="option-btn" data-value="flick">Flick</div>
+                        <div class="option-btn selected" data-value="mixed">Mixed</div>
+                        <div class="option-btn" data-value="tracking">Tracking</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Skill Level</label>
+                    <div class="options-grid" id="skillLevel">
+                        <div class="option-btn selected" data-value="beginner">Beginner</div>
+                        <div class="option-btn" data-value="intermediate">Intermediate</div>
+                        <div class="option-btn" data-value="competitive">Competitive</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="generateBtn" class="generate-btn">
+                🎮 Generate Sensitivity
+                <div id="remainingCount" style="font-size: 0.8rem; margin-top: 5px;">2 remaining today</div>
+            </button>
+
+            <div id="results" class="results hidden">
+                <h2>🎯 Your Sensitivity Range</h2>
+                
+                <table class="sensitivity-table">
+                    <tr>
+                        <td class="scope-name">General</td>
+                        <td class="sensitivity-range" id="generalRange">65-75</td>
+                    </tr>
+                    <tr>
+                        <td class="scope-name">Red Dot</td>
+                        <td class="sensitivity-range" id="redDotRange">55-65</td>
+                    </tr>
+                    <tr>
+                        <td class="scope-name">2x Scope</td>
+                        <td class="sensitivity-range" id="scope2xRange">45-55</td>
+                    </tr>
+                    <tr>
+                        <td class="scope-name">4x Scope</td>
+                        <td class="sensitivity-range" id="scope4xRange">35-45</td>
+                    </tr>
+                    <tr>
+                        <td class="scope-name">AWM Scope</td>
+                        <td class="sensitivity-range" id="awmRange">25-35</td>
+                    </tr>
+                </table>
+
+                <div class="tips">
+                    <h3>💡 Testing Tips:</h3>
+                    <p>• Start with the LOWER value in each range</p>
+                    <p>• Test in Training Ground for 5 minutes</p>
+                    <p>• Adjust slowly based on your comfort</p>
+                    <p>• Focus on consistency, not headshots</p>
+                </div>
+
+                <div class="disclaimer">
+                    ⚠️ <strong>Important:</strong> This does not guarantee headshots.<br>
+                    Skill and practice matter more than sensitivity.
+                </div>
+            </div>
+        </div>
+
+        <div id="limitMessage" class="limit-message hidden">
+            <h2 id="limitTitle">Batas Gratis Harian Tercapai</h2>
+            <p id="limitBody">Anda telah menggunakan 2 generate gratis hari ini.</p>
+
+            <div class="contact-info">
+                <p style="margin-bottom: 10px; color: var(--text-primary);">Untuk Mendapatkan Kode Redeem Premium<br>beli di:</p>
+                <p style="margin-bottom: 5px; font-size: 0.9rem;">
+                    📧 Email: <strong style="color: #ff4757;">darastoreof@gmail.com</strong>
+                </p>
+                <p style="margin-bottom: 0; font-size: 0.9rem;">
+                    📞 WhatsApp (WA): <strong style="color: #ff4757;">0895405563874</strong>
+                </p>
+            </div>
+            <p>Masukkan Kode Redeem Premium di bawah ini untuk melanjutkan.</p>
+
+            <div class="input-group mt-20">
+                <label style="color: var(--accent-secondary); font-weight: bold;">Masukkan Kode Redeem:</label>
+                <input type="text" id="redeemCodeInput" placeholder="CNT30-PAYLOAD-HASH" style="text-align: left; padding: 12px; margin-top: 5px;"/>
+                <button id="redeemBtn" class="generate-btn" style="margin-top: 10px; background: linear-gradient(135deg, #00b894, #00cec9);">
+                    🔑 Aktifkan Premium
+                </button>
+            </div>
+            <div class="reset-time">
+                Reset harian: <strong>04:00 AM</strong> (waktu lokal)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // *** KUNCI RAHASIA ***
+        const SECRET_KEY = 1337420;
+        const HASH_DIVISOR = 1000000;
+        
+        // App State
+        const state = {
+            genCount: 0,
+            lastReset: null,
+            premiumExpiresAt: null,
+            premiumMode: 'free',
+            totalGenerates: 0,
+        };
+
+        // DOM Elements
+        const elements = {
+            mainContent: document.getElementById('mainContent'),
+            limitMessage: document.getElementById('limitMessage'),
+            statusBadge: document.getElementById('statusBadge'),
+            generateBtn: document.getElementById('generateBtn'),
+            remainingCount: document.getElementById('remainingCount'),
+            results: document.getElementById('results'),
+            screenSize: document.getElementById('screenSize'),
+            screenValue: document.getElementById('screenValue'),
+            screenDisplay: document.getElementById('screenDisplay'),
+            redeemCodeInput: document.getElementById('redeemCodeInput'),
+            redeemBtn: document.getElementById('redeemBtn'),
+            limitTitle: document.getElementById('limitTitle'),
+            limitBody: document.getElementById('limitBody')
+        };
+
+        const sensitivityPresets = {
+            base: {
+                general: [65, 75], redDot: [55, 65], scope2x: [45, 55],
+                scope4x: [35, 45], awm: [25, 35]
+            },
+            refreshRate: {
+                60: { multiplier: 1.0 }, 90: { multiplier: 0.95 }, 120: { multiplier: 0.9 }
+            },
+            combatRange: {
+                close: { offset: 5 }, medium: { offset: 0 }, far: { offset: -5 }
+            },
+            aimStyle: {
+                flick: { spread: 10 }, mixed: { spread: 8 }, tracking: { spread: 6 }
+            },
+            skillLevel: {
+                beginner: { reduction: 5 }, intermediate: { reduction: 0 }, competitive: { reduction: -5 }
+            }
+        };
+
+        // =========================================================
+        // SCRIPT UNTUK BACKGROUND SLIDESHOW OTOMATIS (METODE LAPISAN)
+        // =========================================================
+
+        const backgroundImages = [
+            // GANTI URL ini dengan URL gambar Free Fire Indonesia Anda (minimal 2 gambar)
+            'bg1.jpg',
+            'bg2.jpg',
+            'bg3.jpg',
+            'bg4.jpg',
+        ];
+
+        let currentImageIndex = 0;
+        const bodyElement = document.body;
+        const transitionDurationMs = 1500; // Sesuai CSS transition: 1.5s
+
+        function updateBackgroundImage() {
+            // 1. Dapatkan URL gambar saat ini
+            const imageUrl = backgroundImages[currentImageIndex];
+            
+            // 2. Preload gambar
+            const img = new Image();
+            img.onload = () => {
+                // 3. Setelah gambar dimuat, buat lapisan baru
+                const newBackground = document.createElement('div');
+                newBackground.className = 'bg-layer';
+                newBackground.style.backgroundImage = `url('${imageUrl}')`;
+
+                // Cari lapisan aktif saat ini
+                const currentLayer = document.querySelector('.bg-layer.active');
+
+                // Tambahkan lapisan baru ke body
+                bodyElement.appendChild(newBackground);
+                
+                // Beri waktu browser untuk merender lapisan baru
+                setTimeout(() => {
+                    // 4. Aktifkan lapisan baru (Opacity 0 -> 1)
+                    newBackground.classList.add('active');
+                    
+                    if (currentLayer) {
+                        // 5. De-aktifkan lapisan lama (Opacity 1 -> 0)
+                        currentLayer.classList.remove('active');
+                        
+                        // Hapus layer lama setelah transisi selesai
+                        setTimeout(() => {
+                            currentLayer.remove();
+                        }, transitionDurationMs);
+                    }
+                }, 50); // Delay kecil untuk memastikan rendering
+            };
+            
+            img.src = imageUrl; // Mulai memuat gambar
+
+            // Pindah ke gambar berikutnya
+            currentImageIndex++;
+            if (currentImageIndex >= backgroundImages.length) {
+                currentImageIndex = 0;
+            }
+        }
+
+        function initBackgroundSlideshow() {
+            if (backgroundImages.length > 0) {
+                // Buat layer pertama (tanpa transisi/instan)
+                const firstLayer = document.createElement('div');
+                firstLayer.className = 'bg-layer active';
+                firstLayer.style.backgroundImage = `url('${backgroundImages[0]}')`;
+                firstLayer.style.transition = 'none'; // Jangan transisi gambar pertama
+                
+                bodyElement.appendChild(firstLayer);
+                
+                // Kembalikan transisi setelah ditampilkan
+                setTimeout(() => {
+                    firstLayer.style.transition = 'opacity 1.5s ease-in-out';
+                }, 100);
+
+                currentImageIndex = 1; // Mulai dari gambar kedua
+                
+                // Atur interval untuk mengganti gambar setiap 5 detik (5000ms)
+                setInterval(updateBackgroundImage, 5000);
+            }
+        }
+
+
+        // =========================================================
+        // FUNGSI UTAMA APLIKASI
+        // =========================================================
+
+        function init() {
+            loadState();
+            checkDailyReset();
+            updateUI();
+            setupEventListeners();
+            setupRedeemCode();
+            
+            // PANGGIL FUNGSI SLIDESHOW DI SINI
+            initBackgroundSlideshow();
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            const savedState = localStorage.getItem('ffSensitivityState');
+            if (savedState) {
+                const loaded = JSON.parse(savedState);
+                state.genCount = loaded.genCount || 0;
+                state.lastReset = loaded.lastReset || null;
+                state.premiumExpiresAt = loaded.premiumExpiresAt || null;
+                state.premiumMode = loaded.premiumMode || 'free';
+                state.totalGenerates = loaded.totalGenerates || 0;
+            }
+            
+            if (state.lastReset === null) {
+                state.lastReset = Date.now();
+                saveState();
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('ffSensitivityState', JSON.stringify(state));
+        }
+
+        // FIX BUG RESET HARIAN: Check if daily reset needed (04:00 AM local time)
+        function checkDailyReset() {
+            const now = new Date();
+            const lastResetDate = new Date(state.lastReset);
+            const resetTimeHour = 4; // 4 AM
+
+            // 1. Definisikan Titik Reset Harian (Hari Ini)
+            const todayResetTime = new Date(now);
+            todayResetTime.setHours(resetTimeHour, 0, 0, 0); // Set ke jam 04:00:00 hari ini
+
+            let shouldReset = false;
+
+            // Logika utama: Jika waktu sekarang sudah melewati 4AM hari ini (now >= todayResetTime),
+            // dan state.lastReset (waktu kapan terakhir kali dihitung/di-reset)
+            // ada SEBELUM 4AM hari ini (state.lastReset < todayResetTime).
+            if (now.getTime() >= todayResetTime.getTime() && state.lastReset < todayResetTime.getTime()) {
+                shouldReset = true;
+            } else if (now.getDate() !== lastResetDate.getDate() && now.getHours() >= resetTimeHour) {
+                // Kasus tambahan: jika hari sudah berganti (setelah midnight) dan sekarang sudah lewat 4 pagi
+                shouldReset = true;
+            }
+
+            if (shouldReset && state.premiumMode === 'free') {
+                state.genCount = 0;
+                // Set lastReset ke waktu sekarang
+                state.lastReset = now.getTime();
+                saveState();
+            }
+            
+            // Check for time mode expiration (Logic ini sudah benar)
+            if (state.premiumMode === 'time' && state.premiumExpiresAt < now.getTime()) {
+                state.premiumMode = 'free';
+                state.totalGenerates = 0;
+                state.genCount = 0;
+                saveState();
+            }
+        }
+
+        // Update UI based on state
+        function updateUI() {
+            let isLimited = false;
+            let remainingText = '';
+            const now = Date.now();
+            
+            // Check for time mode expiration and reset if necessary
+            if (state.premiumMode === 'time' && now >= state.premiumExpiresAt) {
+                state.premiumMode = 'free';
+                state.totalGenerates = 0;
+                state.genCount = 0;
+                saveState();
+            }
+
+            // Determine status badge and remaining count text
+            if (state.premiumMode === 'time') {
+                const remainingTimeMs = state.premiumExpiresAt - now;
+                const hours = Math.floor(remainingTimeMs / (1000 * 60 * 60));
+                const minutes = Math.floor((remainingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                elements.statusBadge.textContent = `UNLIMITED (${hours}j ${minutes}m)`;
+                elements.statusBadge.className = 'status-badge status-premium';
+                remainingText = `Unlimited (${hours}j ${minutes}m left)`;
+                isLimited = false;
+            } else if (state.premiumMode === 'count') {
+                const remaining = state.totalGenerates - state.genCount;
+                elements.statusBadge.textContent = `PRO (${remaining} Left)`;
+                elements.statusBadge.className = 'status-badge status-premium';
+                remainingText = `${remaining} remaining (${state.totalGenerates} Total)`;
+                isLimited = remaining <= 0;
+            } else {
+                const remaining = 2 - state.genCount;
+                elements.statusBadge.textContent = 'FREE';
+                elements.statusBadge.className = 'status-badge status-free';
+                remainingText = `${remaining} remaining today`;
+                isLimited = remaining <= 0;
+            }
+            
+            elements.remainingCount.textContent = remainingText;
+            elements.generateBtn.disabled = isLimited;
+
+            // Logic untuk menentukan kapan harus menampilkan layar batas
+            const freeLimitReached = state.premiumMode === 'free' && state.genCount >= 2;
+            const countLimitReached = state.premiumMode === 'count' && state.genCount >= state.totalGenerates;
+
+            if (freeLimitReached || countLimitReached) {
+                elements.mainContent.classList.add('hidden');
+                elements.limitMessage.classList.remove('hidden');
+
+                // Update text based on which limit was reached
+                if (freeLimitReached) {
+                    elements.limitTitle.textContent = 'Batas Gratis Harian Tercapai';
+                    elements.limitBody.textContent = 'Anda telah menggunakan 2 generate gratis hari ini.';
+                } else if (countLimitReached) {
+                    elements.limitTitle.textContent = 'Batas Generate Premium Habis';
+                    elements.limitBody.textContent = `Anda telah menggunakan ${state.totalGenerates} generate premium.`;
+                }
+
+            } else {
+                elements.mainContent.classList.remove('hidden');
+                elements.limitMessage.classList.add('hidden');
+            }
+        }
+        
+        function setupEventListeners() {
+            elements.screenSize.addEventListener('input', (e) => {
+                const value = e.target.value;
+                elements.screenValue.textContent = value;
+                elements.screenDisplay.textContent = `${value}"`;
+            });
+            setupOptionButtons('refreshRate');
+            setupOptionButtons('combatRange');
+            setupOptionButtons('aimStyle');
+            setupOptionButtons('skillLevel');
+            elements.generateBtn.addEventListener('click', generateSensitivity);
+        }
+
+        function setupOptionButtons(containerId) {
+            const container = document.getElementById(containerId);
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('option-btn')) {
+                    container.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    e.target.classList.add('selected');
+                }
+            });
+        }
+
+        function getSelectedValue(containerId) {
+            const container = document.getElementById(containerId);
+            const selected = container.querySelector('.option-btn.selected');
+            return selected ? selected.dataset.value : null;
+        }
+        
+        function generateSensitivity() {
+            const now = Date.now();
+            let shouldGenerate = true;
+            
+            // Periksa limit sebelum generate
+            if (state.premiumMode === 'free') {
+                if (state.genCount >= 2) {
+                    shouldGenerate = false;
+                } else {
+                    state.genCount++;
+                }
+            } else if (state.premiumMode === 'count') {
+                if (state.genCount >= state.totalGenerates) {
+                    alert('Batas generate paket Anda sudah habis. Masukkan kode redeem baru.');
+                    shouldGenerate = false;
+                } else {
+                    state.genCount++;
+                }
+            } else if (state.premiumMode === 'time') {
+                if (now >= state.premiumExpiresAt) {
+                    updateUI(); // Resets to free mode
+                    alert('Waktu Premium 24 Jam Anda telah habis. Kembali ke mode Free.');
+                    shouldGenerate = false;
+                }
+            }
+
+            if (!shouldGenerate) {
+                saveState();
+                updateUI();
+                return;
+            }
+
+            // Lanjut ke perhitungan (hanya jika shouldGenerate = true)
+            const screenSize = parseFloat(elements.screenSize.value);
+            const refreshRate = getSelectedValue('refreshRate');
+            const combatRange = getSelectedValue('combatRange');
+            const aimStyle = getSelectedValue('aimStyle');
+            const skillLevel = getSelectedValue('skillLevel');
+            const base = sensitivityPresets.base;
+            const refreshMod = sensitivityPresets.refreshRate[refreshRate].multiplier;
+            const rangeOffset = sensitivityPresets.combatRange[combatRange].offset;
+            const aimSpread = sensitivityPresets.aimStyle[aimStyle].spread;
+            const skillReduction = sensitivityPresets.skillLevel[skillLevel].reduction;
+            const ranges = {};
+
+            for (const scope in base) {
+                let [min, max] = base[scope];
+                min = Math.round((min + rangeOffset + skillReduction) * refreshMod);
+                max = Math.round((max + rangeOffset + skillReduction) * refreshMod);
+                const spread = max - min;
+                if (spread > aimSpread) {
+                    const diff = spread - aimSpread;
+                    min += Math.floor(diff / 2);
+                    max -= Math.ceil(diff / 2);
+                }
+                ranges[scope] = [
+                    Math.max(1, Math.min(100, min)),
+                    Math.max(1, Math.min(100, max))
+                ];
+            }
+            
+            const screenEffect = 1 - ((screenSize - 5.0) / 20);
+            for (const scope in ranges) {
+                ranges[scope] = ranges[scope].map(val => Math.round(val * screenEffect));
+            }
+            
+            displayResults(ranges);
+            saveState();
+            updateUI(); // Panggil updateUI setelah generate berhasil
+        }
+
+        function displayResults(ranges) {
+            document.getElementById('generalRange').textContent = `${ranges.general[0]}-${ranges.general[1]}`;
+            document.getElementById('redDotRange').textContent = `${ranges.redDot[0]}-${ranges.redDot[1]}`;
+            document.getElementById('scope2xRange').textContent = `${ranges.scope2x[0]}-${ranges.scope2x[1]}`;
+            document.getElementById('scope4xRange').textContent = `${ranges.scope4x[0]}-${ranges.scope4x[1]}`;
+            document.getElementById('awmRange').textContent = `${ranges.awm[0]}-${ranges.awm[1]}`;
+            elements.results.classList.remove('hidden');
+            elements.results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function setupRedeemCode() {
+            elements.redeemBtn.addEventListener('click', () => {
+                const code = elements.redeemCodeInput.value.toUpperCase().trim();
+                checkRedeemCode(code);
+            });
+        }
+
+        // FUNGSI HASH
+        function checkRedeemCode(code) {
+            if (!code) {
+                alert('Masukkan kode redeem.');
+                return;
+            }
+
+            const parts = code.split('-');
+            if (parts.length !== 3) {
+                alert('Format kode tidak valid (Harus PREFIX-PAYLOAD-HASH).');
+                return;
+            }
+
+            const [prefix, payload, userHash] = parts;
+            let limit = 0;
+            let type = '';
+            
+            if (prefix.startsWith('CNT')) {
+                limit = parseInt(prefix.substring(3));
+                type = 'count';
+            } else if (prefix.startsWith('TIME')) {
+                limit = parseInt(prefix.substring(4));
+                type = 'time';
+            }
+
+            if (isNaN(limit) || limit < 1 || (type === 'count' && limit !== 15 && limit !== 30) || (type === 'time' && limit !== 24)) {
+                alert('Kode tidak valid (Prefix tidak dikenal atau limit salah).');
+                return;
+            }
+            
+            // 1. Hitung Base Value (Total ASCII)
+            const combined = prefix + payload;
+            let baseValue = 0;
+            for (let i = 0; i < combined.length; i++) {
+                baseValue += combined.charCodeAt(i);
+            }
+            
+            // 2. Hitung Hash menggunakan Secret Key dan Modulo (6 digit)
+            let calculatedHashValue = (baseValue * SECRET_KEY) % HASH_DIVISOR;
+            
+            // 3. Format ke 6 digit dengan padding nol
+            let expectedHash = String(calculatedHashValue);
+            while (expectedHash.length < 6) {
+                expectedHash = '0' + expectedHash;
+            }
+            
+            // 4. Periksa HASH (Bukan Checksum)
+            if (userHash !== expectedHash) {
+                alert('Kode tidak valid, rusak, atau palsu (Verifikasi HASH Gagal).');
+                return;
+            }
+            
+            // Validasi Sekali Pakai (One-Time Use)
+            const codeKey = `${prefix}-${payload}`;
+            const burnedCodesString = localStorage.getItem('ffBurnedCodes') || '';
+            const burnedCodes = new Set(burnedCodesString.split(',').filter(c => c));
+
+            if (burnedCodes.has(codeKey)) {
+                alert('Kode ini sudah pernah digunakan. Mohon beli yang baru.');
+                return; 
+            }
+            
+            // Aktivasi dan Penyimpanan
+            burnedCodes.add(codeKey);
+            localStorage.setItem('ffBurnedCodes', Array.from(burnedCodes).join(','));
+
+            activatePremium(limit, type);
+            
+            elements.redeemCodeInput.value = '';
+        }
+
+        // FIX BUG AKUMULASI KUOTA: Fungsi ini telah diperbaiki.
+        function activatePremium(limit, mode) {
+            const now = Date.now();
+            
+            // 1. HITUNG SISA KUOTA YANG BELUM TERPAKAI
+            let remainingGenerates = 0;
+            if (state.premiumMode === 'count') {
+                // Hanya hitung sisa jika mode sebelumnya adalah 'count'
+                remainingGenerates = Math.max(0, state.totalGenerates - state.genCount);
+            }
+
+            // 2. RESET PENGHITUNGAN
+            state.genCount = 0;
+            state.premiumMode = mode;
+            
+            if (mode === 'count') {
+                // Total kuota baru = Sisa kuota lama + Kuota baru yang di redeem
+                state.totalGenerates = remainingGenerates + limit;
+                state.premiumExpiresAt = null;
+            } else if (mode === 'time') {
+                // Perpanjang waktu jika waktu premium sebelumnya belum habis
+                const startTime = (state.premiumExpiresAt && state.premiumExpiresAt > now) ? state.premiumExpiresAt : now;
+                state.premiumExpiresAt = startTime + (limit * 60 * 60 * 1000);
+                state.totalGenerates = 0;
+            }
+
+            elements.limitMessage.classList.add('hidden');
+            elements.mainContent.classList.remove('hidden');
+            
+            saveState();
+            updateUI();
+            
+            const modeText = mode === 'count' ? limit + ' kali generate' : limit + ' Jam Unlimited';
+            alert(`🎉 Premium ${modeText} berhasil diaktifkan!`);
+        }
+
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+        
+        if (!localStorage.getItem('welcomeShown')) {
+            localStorage.setItem('welcomeShown', 'true');
+            window.location.href = 'welcome.html';
+        }
+    </script>
+</body>
+</html>
