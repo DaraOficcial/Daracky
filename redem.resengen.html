@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Redeem Code Generator</title>
+    <style>
+        /* CSS Styling untuk Tampilan Gelap (Dark Theme) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #1e1e2e;
+            --secondary-bg: #2a2a3a;
+            --card-bg: #35354a;
+            --text-primary: #ffffff;
+            --text-secondary: #c0c0d0;
+            --accent: #00b894; /* Premium Green */
+            --accent-secondary: #ff9f43; /* Orange */
+            --border: #444455;
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 90%;
+            padding: 30px;
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 1rem;
+            -webkit-appearance: none;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #00cec9);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Results Area */
+        .results {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .results h2 {
+            color: var(--accent-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .result-code {
+            background: var(--primary-bg);
+            padding: 10px;
+            border-radius: 6px;
+            color: var(--accent);
+            font-weight: bold;
+            word-break: break-all;
+            display: block;
+            margin-top: 5px;
+            border: 1px dashed var(--accent);
+        }
+
+        .warning {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 71, 87, 0.2);
+            border-radius: 8px;
+            color: #ff4757;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Redeem Code Generator</h1>
+        
+        <div class="form-group">
+            <label for="packageSelect">1. Pilih Paket (PREFIX)</label>
+            <select id="packageSelect">
+                <option value="CNT15">15x Generate (CNT15)</option>
+                <option value="CNT30">30x Generate (CNT30) - BEST SELLER</option>
+                <option value="TIME24">24 Jam Unlimited (TIME24)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="payloadInput">2. Masukkan Kode Unik/Payload (Huruf & Angka, Min 6 Karakter)</label>
+            <input type="text" id="payloadInput" placeholder="Contoh: KODEBARU2024" maxlength="10">
+        </div>
+
+        <button id="generateBtn" class="generate-btn">
+            GENERATE KODE PREMIUM
+        </button>
+
+        <div id="results" class="results hidden">
+            <h2>🎉 Kode Siap Dijual</h2>
+
+            <div class="result-item">
+                <span class="result-label">Kode Redeem Final (COPY INI):</span>
+                <code id="finalCode" class="result-code"></code>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Prefix + Payload:</span>
+                <code id="combinedText" class="result-code" style="border-color: var(--accent-secondary);"></code>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Hash Verifikasi (6 Digit):</span>
+                <code id="checksumValue" class="result-code" style="border-color: var(--accent-secondary);"></code>
+            </div>
+        </div>
+
+        <div class="warning">
+            ⚠️ Pastikan setiap Payload yang Anda gunakan adalah **UNIK** agar kode tidak bisa dipakai dua kali.
+        </div>
+    </div>
+
+    <script>
+        // *** KUNCI RAHASIA HARUS SAMA PERSIS DENGAN KODE UTAMA ***
+        const SECRET_KEY = 1337420;
+        const HASH_DIVISOR = 1000000;
+        
+        // FUNGSI UTAMA UNTUK MENGHITUNG HASH BARU
+        function generateComplexHash(prefix, payload) {
+            const combined = prefix.toUpperCase() + payload.toUpperCase();
+            let baseValue = 0;
+            
+            // 1. Hitung Base Value (Total ASCII)
+            for (let i = 0; i < combined.length; i++) {
+                baseValue += combined.charCodeAt(i);
+            }
+            
+            // 2. Hitung Hash (Perkalian dengan Kunci Rahasia + Modulo)
+            let calculatedHashValue = (baseValue * SECRET_KEY) % HASH_DIVISOR;
+            
+            // 3. Format ke 6 digit dengan padding nol
+            let hashString = String(calculatedHashValue);
+            while (hashString.length < 6) {
+                hashString = '0' + hashString;
+            }
+            return hashString;
+        }
+        
+        function handleGenerate() {
+            const prefix = document.getElementById('packageSelect').value;
+            const payload = document.getElementById('payloadInput').value.trim().toUpperCase();
+            const resultsDiv = document.getElementById('results');
+
+            // 1. Validasi Input
+            if (payload.length < 6 || !/^[A-Z0-9]+$/.test(payload)) {
+                alert('Payload harus terdiri dari minimal 6 karakter (huruf A-Z dan angka 0-9 saja).');
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+            
+            // 2. Hitung Hash Baru
+            const calculatedHash = generateComplexHash(prefix, payload);
+            
+            // 3. Buat Kode Final
+            const finalCode = `${prefix}-${payload}-${calculatedHash}`;
+
+            // 4. Tampilkan Hasil
+            document.getElementById('finalCode').textContent = finalCode;
+            document.getElementById('combinedText').textContent = prefix + payload;
+            document.getElementById('checksumValue').textContent = calculatedHash;
+            
+            resultsDiv.classList.remove('hidden');
+        }
+
+        // Setup Event Listener
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('generateBtn').addEventListener('click', handleGenerate);
+            
+            // Menghapus hasil saat ada perubahan input
+            document.getElementById('packageSelect').addEventListener('change', () => {
+                document.getElementById('results').classList.add('hidden');
+            });
+            document.getElementById('payloadInput').addEventListener('input', () => {
+                document.getElementById('results').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
